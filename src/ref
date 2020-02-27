@@ -1,0 +1,254 @@
+
+import React from 'react';
+import './App.css';
+/* import DualListBox from 'react-dual-listbox';
+import 'react-dual-listbox/lib/react-dual-listbox.css';
+
+class App extends React.Component {
+  constructor(props){
+    super(props);
+    this.state={
+    
+      selected: ['one'],
+    }
+  }
+  options = [
+    {label:'One', value: 1},
+    {label:'Two', value: 2},
+    {label:'Three', value: 3}
+  ];
+
+  render(){
+    let {selected}=this.state;
+    return(<><DualListBox options={this.options} selected={selected}
+    onChange={(selected)=>{this.setState({selected})}}
+    /></>)
+  }
+} */
+
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      items: [
+        "one",
+        "two",
+        "three"
+      ],
+      data1: [],
+      data2: []
+
+    };
+  }
+
+
+
+  handleChange = (e) => {
+    let { value } = e.target;
+    let { data1 } = this.state;
+    console.log(value)
+    // data1.map((data)=> {if(!data1.includes(data))
+      data1.push(value)
+      this.setState({data1:data1})
+    //})
+    // this.setState({ items: data1 })
+  }
+
+
+
+
+  addItem = () => {
+    let { data1, data2 } = this.state;
+   data1.map((data, i) => {
+      // if (data2.indexOf(data) <= -1) {
+        if (data2.indexOf(data) <= -1) {
+          data2.push(data)
+        }
+        data1.splice(i,1)
+        
+
+      // }
+    })
+    this.setState({ 
+      data1:data1,
+      data2: data2 })
+
+  }
+  /*
+  addItem = () => {
+    <select>
+      {
+  this.state.selectedvalue.map((value)=>{return <option value={value}>{value}</option>}) 
+      }
+    </select>
+  } */
+
+  render() {
+    const { items } = this.state;
+
+    return (
+      <div>
+        <select size="4" multiple onBlur={(e) => this.handleChange(e)}>
+          {items.map((value, i) => <option key={i} value={value}>{value}</option>)}
+        </select>
+        <input type="button" value="<" onClick={this.addItem} />
+        <input type="button" value=">" />
+
+        <select size="4" multiple /* onChange={(e) => this.handleChange(e)} */>
+          {this.state.data2.map((value, i) => <option key={i} value={value}>{value}</option>)}
+        </select>
+      </div>
+    );
+
+  }
+}
+
+
+export default App;
+import React from 'react'
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: [],
+      list:['One',
+      'Two',
+      'Three',
+      'Four',],
+      selectedData: [],
+      tempData: [],
+      removeData: [],
+      selectedIndex: '',
+      temp: ''
+
+    }
+  }
+  componentWillMount(){
+    this.setState({data:this.state.list})
+  }
+
+  
+  handleChange = (e) => {
+    var option = e.target.options;
+    const { tempData } = this.state;
+    for (let i = 0, l = option.length; i < l; i++) {
+      if (option[i].selected) {
+        if (!tempData.includes(option[i].value))
+          tempData.push(option[i].value);
+      }
+    }
+    this.setState({...tempData})
+  }
+
+  getSelectedOptions = () => {
+    const { data, tempData,selectedData } = this.state;
+    let a = data.filter((val) => {
+      if (!tempData.includes(val))
+        return val;
+    })
+
+    this.setState({
+      selectedData:[...selectedData,...tempData],
+      data: a,
+      removeData: [],
+      tempData:[]
+    })
+  }
+
+  
+  handleSecondList = (e) => {
+    var option = e.target.options;
+    let { temp } = this.state
+    const { removeData } = this.state;
+    for (let i = 0, l = option.length; i < l; i++) {
+      if (option[i].selected) {
+        temp = option[i].value;
+        if (!removeData.includes(option[i].value))
+          removeData.push(option[i].value);
+      }
+    }
+    this.setState({ selectedIndex: option.selectedIndex, removeData:removeData })
+  }
+
+  getSecondListSelectedOptions = () => {
+    const { data, tempData, selectedData, removeData } = this.state;
+    removeData.map((item, i) => {
+      data.push(item);
+    })
+
+    let a = selectedData.filter((val) => {
+      if (!removeData.includes(val))
+        return val;
+    })
+
+    this.setState({
+      selectedData:[...selectedData,...removeData],
+      data:a,
+      removeData: [],
+      // tempData: a,
+    })
+  }
+
+  handleDown = () => {
+    let { selectedData, selectedIndex } = this.state;;
+    if (-1 === selectedIndex) {
+      alert("Please select an option to move.");
+      return;
+    }
+    if (selectedIndex === selectedData.length - 1) {
+      let temp = selectedData[selectedIndex];
+      selectedData[selectedIndex] = selectedData[0]
+      selectedData[0] = temp
+    } else {
+      let temp1 = selectedData[selectedIndex];
+      selectedData[selectedIndex] = selectedData[selectedIndex + 1]
+      selectedData[selectedIndex + 1] = temp1;
+    }
+
+
+    this.setState({ selectedData: selectedData , removeData:[]})
+  }
+
+  handleUp = () => {
+    let { selectedData, selectedIndex } = this.state;;
+    if (-1 === selectedIndex) {
+      alert("Please select an option to move.");
+      return;
+    } 
+    if (selectedIndex === 0) {
+      let temp = selectedData[selectedIndex];
+      selectedData[0] = selectedData[selectedData.length-1]
+      selectedData[selectedData.length-1] = temp;
+    } else {
+      var temp1 = selectedData[selectedIndex];
+      selectedData[selectedIndex] = selectedData[selectedIndex - 1]
+      selectedData[selectedIndex - 1] = temp1;
+    }
+      this.setState({ selectedData: selectedData ,removeData:[]})
+    }
+
+    render() {
+      return (<><select name="data" size="10" multiple onChange={this.handleChange}>
+        {
+          this.state.list.map((item, i) => {
+            if(this.state.data.includes(item)){return <option value={item} key={i}>{item}</option>}
+          })
+        }
+      </select>
+        <button onClick={this.getSelectedOptions} >  >  </button>
+        <button onClick={this.getSecondListSelectedOptions} >  {"<"}  </button>
+        <select name="selected" size="10" id="selected" onChange={this.handleSecondList} multiple>
+          {
+            this.state.selectedData.map((item, i) => (
+              <option value={item}>{item}</option>
+            ))
+          }
+        </select>
+        <button onClick={this.handleDown}>Move Down</button>
+
+        <button onClick={this.handleUp}>Move Up</button>
+      </>)
+    }
+
+  }
+  export default App;
